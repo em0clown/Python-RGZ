@@ -44,12 +44,13 @@
 - ✅ Возможность новой игры без перезапуска
 
 ## 📸 Скриншоты
-![alt text](Informatics/image/image.png)
+![alt text](image.png)
 ### Игровой интерфейс
-![alt text](Informatics/image/image1.png)
+![alt text](image1.png)
 
 
 ## Структура кода
+'''mermaid
 flowchart TD
     Start[Начало программы] --> Init[Инициализация<br>констант и переменных]
     Init --> GUI[Создание графического<br>интерфейса]
@@ -148,3 +149,4 @@ flowchart TD
     MainLoop --> |Событие: Кнопка "Новая игра"| NewGame[Новая игра]
     NewGame --> FullReset[Полный сброс игры]
     FullReset --> Reinitialize[Повторная инициализация]
+'''
