@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Python Version](https://img.shields.io/badge/python-3.6%2B-blue)
+![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Tkinter](https://img.shields.io/badge/GUI-Tkinter-green)
 ![Status](https://img.shields.io/badge/status-complete-brightgreen)
 
