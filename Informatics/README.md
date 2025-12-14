@@ -44,9 +44,9 @@
 - ✅ Возможность новой игры без перезапуска
 
 ## 📸 Скриншоты
-![alt text](../image.png)
+![alt text](Informatics/image/image.png)
 ### Игровой интерфейс
-![alt text](../image1.png)
+![alt text](Informatics/image/image1.png)
 
 
 ## Структура кода
