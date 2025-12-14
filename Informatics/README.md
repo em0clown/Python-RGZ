@@ -50,103 +50,49 @@
 
 
 ## Структура кода
-'''mermaid
+
+```mermaid
 flowchart TD
-    Start[Начало программы] --> Init[Инициализация<br>констант и переменных]
-    Init --> GUI[Создание графического<br>интерфейса]
+    Start[Запуск игры] --> Config[Загрузка настроек]
+    Config --> CreateGUI[Создание интерфейса]
+    CreateGUI --> InitBoards[Инициализация досок]
     
-    GUI --> CreatePlayerBoard[Создание доски игрока]
-    GUI --> CreateComputerBoard[Создание доски компьютера]
-    GUI --> CreateButtons[Создание панели кнопок]
-    GUI --> CreateLegend[Создание панели легенды]
+    InitBoards --> PlacementPhase[Фаза расстановки]
+    PlacementPhase --> ManualMode[Ручной режим]
+    PlacementPhase --> AutoMode[Автоматический режим]
     
-    CreatePlayerBoard --> BindEventsPlayer[Привязка событий к доске игрока]
-    CreateComputerBoard --> BindEventsComputer[Привязка событий к доске компьютера]
-    CreateButtons --> BindButtonEvents[Привязка событий к кнопкам]
+    ManualMode --> PlaceShip[Разместить корабль]
+    AutoMode --> RandomPlace[Случайная расстановка]
     
-    BindEventsPlayer --> Hover[update_hover при движении мыши]
-    BindEventsPlayer --> ClickPlayer[player_click при клике]
-    BindEventsComputer --> ClickComputer[computer_board_click при клике]
+    PlaceShip --> CheckPlacement{Все корабли размещены?}
+    RandomPlace --> CheckPlacement
     
-    BindButtonEvents --> BtnAuto[auto_place]
-    BindButtonEvents --> BtnManual[Активация ручного режима]
-    BindButtonEvents --> BtnClear[clear_board]
-    BindButtonEvents --> BtnStart[start_game]
-    BindButtonEvents --> BtnNew[new_game]
+    CheckPlacement -->|Нет| PlacementPhase
+    CheckPlacement -->|Да| BattlePhase[Фаза боя]
     
-    BindEventsPlayer --> InitGame[Инициализация игры]
-    InitGame --> PlaceComputerShips[Расстановка кораблей компьютера]
-    InitGame --> DrawInitial[Первоначальная отрисовка]
+    BattlePhase --> PlayerTurn[Ход игрока]
+    PlayerTurn --> ProcessShot[Обработка выстрела]
     
-    DrawInitial --> MainLoop[Запуск главного цикла Tkinter]
+    ProcessShot --> Hit{Попадание?}
+    Hit -->|Да| MarkHit[Пометить попадание]
+    Hit -->|Нет| MarkMiss[Пометить промах]
     
-    MainLoop --> |Событие: Клик по своей доске| CheckPhase{Какая фаза игры?}
-    CheckPhase --> |Фаза расстановки| ManualPlacement[Ручное размещение корабля]
-    CheckPhase --> |Фаза боя| InvalidClick[Игнорировать клик]
+    MarkHit --> CheckDestroyed{Корабль уничтожен?}
+    CheckDestroyed -->|Да| MarkDestroyed[Пометить корабль]
+    CheckDestroyed -->|Нет| ComputerTurn[Ход компьютера]
     
-    ManualPlacement --> CanPlace{Можно разместить?}
-    CanPlace --> |Да| PlaceShip[Разместить корабль]
-    CanPlace --> |Нет| ShowError[Показать ошибку]
-    
-    PlaceShip --> UpdateBoard[Обновить доску]
-    UpdateBoard --> CheckAllPlaced{Все корабли размещены?}
-    CheckAllPlaced --> |Да| ReadyForBattle[Готово к бою]
-    CheckAllPlaced --> |Нет| NextShip[Перейти к следующему кораблю]
-    
-    MainLoop --> |Событие: Клик по доске компьютера| CheckGameStarted{Игра началась?}
-    CheckGameStarted --> |Нет| Ignore[Игнорировать]
-    CheckGameStarted --> |Да| ProcessShot[Обработать выстрел]
-    
-    ProcessShot --> CheckCell{Состояние клетки?}
-    CheckCell --> |Пусто/Корабль| ValidShot[Валидный выстрел]
-    CheckCell --> |Уже стреляли| InvalidShot[Невалидный выстрел]
-    
-    ValidShot --> |Попал| Hit[Отметить попадание]
-    ValidShot --> |Промах| Miss[Отметить промах]
-    
-    Hit --> CheckDestroyed{Корабль уничтожен?}
-    CheckDestroyed --> |Да| MarkDestroyed[Пометить весь корабль]
-    CheckDestroyed --> |Нет| Continue[Продолжить]
-    
+    MarkMiss --> ComputerTurn
     MarkDestroyed --> CheckWin{Все корабли противника уничтожены?}
-    Miss --> CheckWin
     
-    CheckWin --> |Игрок победил| PlayerWin[Показать победу]
-    CheckWin --> |Еще есть корабли| ComputerTurn[Ход компьютера]
+    ComputerTurn --> ComputerShot[Выстрел компьютера]
+    ComputerShot --> CheckPlayerWin{Все корабли игрока уничтожены?}
     
-    ComputerTurn --> ComputerLogic[Логика хода компьютера]
-    ComputerLogic --> ComputerShot[Выстрел компьютера]
+    CheckWin -->|Да| GameWin[Игрок победил!]
+    CheckWin -->|Нет| PlayerTurn
     
-    ComputerShot --> CheckPlayerCell{Состояние клетки игрока?}
-    CheckPlayerCell --> |Корабль| ComputerHit[Попадание компьютера]
-    CheckPlayerCell --> |Пусто| ComputerMiss[Промах компьютера]
+    CheckPlayerWin -->|Да| GameLose[Компьютер победил!]
+    CheckPlayerWin -->|Нет| PlayerTurn
     
-    ComputerHit --> CheckPlayerDestroyed{Корабль игрока уничтожен?}
-    CheckPlayerDestroyed --> |Да| MarkPlayerDestroyed[Пометить корабль игрока]
-    CheckPlayerDestroyed --> |Нет| ShowHitMessage[Показать сообщение]
-    
-    MarkPlayerDestroyed --> CheckPlayerWin{Все корабли игрока уничтожены?}
-    ComputerMiss --> CheckPlayerWin
-    
-    CheckPlayerWin --> |Компьютер победил| ComputerWin[Показать поражение]
-    CheckPlayerWin --> |Еще есть корабли| PlayerTurn[Ожидание хода игрока]
-    
-    MainLoop --> |Событие: Нажатие клавиши R| KeyPress[Обработка нажатия]
-    KeyPress --> ToggleDirection[Переключить направление корабля]
-    
-    MainLoop --> |Событие: Кнопка "Авторазмещение"| AutoPlace[Автоматическая расстановка]
-    AutoPlace --> RandomPlacement[Случайное размещение всех кораблей]
-    RandomPlacement --> UpdateDisplay[Обновить отображение]
-    
-    MainLoop --> |Событие: Кнопка "Очистить доску"| ClearBoard[Очистка доски]
-    ClearBoard --> ResetPlacement[Сброс расстановки]
-    
-    MainLoop --> |Событие: Кнопка "В бой!"| StartBattle[Начать игру]
-    StartBattle --> CheckReady{Все корабли размещены?}
-    CheckReady --> |Да| ActivateBattle[Активировать фазу боя]
-    CheckReady --> |Нет| ShowWarning[Показать предупреждение]
-    
-    MainLoop --> |Событие: Кнопка "Новая игра"| NewGame[Новая игра]
-    NewGame --> FullReset[Полный сброс игры]
-    FullReset --> Reinitialize[Повторная инициализация]
-'''
+    GameWin --> End[Конец игры]
+    GameLose --> End
+```
